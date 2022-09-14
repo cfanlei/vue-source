@@ -1,8 +1,7 @@
 import Vue from './runtime-with-compiler'
 import * as vca from 'v3'
 import { extend } from 'shared/util'
-debugger;
-console.log("11111");
+
 
 extend(Vue, vca)
 
