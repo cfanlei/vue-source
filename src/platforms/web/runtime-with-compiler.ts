@@ -78,7 +78,7 @@ Vue.prototype.$mount = function (
         },
         this
       )
-      options.render = render
+      options.render = render  // = vm.$options.render = render
       options.staticRenderFns = staticRenderFns
 
       /* istanbul ignore if */

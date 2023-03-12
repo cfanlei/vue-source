@@ -28,12 +28,13 @@ import {
   isRegExp,
   isPrimitive
 } from '../util/index'
+import { VNodeData } from 'types/vnode'
 
 export const emptyNode = new VNode('', {}, [])
 
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
-
-function sameVnode(a, b) {
+//_cfanlei@:判断是否为相同的vnode
+function sameVnode(a:VNode, b:VNode) {
   return (
     a.key === b.key &&
     a.asyncFactory === b.asyncFactory &&
@@ -41,16 +42,18 @@ function sameVnode(a, b) {
       a.isComment === b.isComment &&
       isDef(a.data) === isDef(b.data) &&
       sameInputType(a, b)) ||
-      (isTrue(a.isAsyncPlaceholder) && isUndef(b.asyncFactory.error)))
+      (isTrue(a.isAsyncPlaceholder) && isUndef(b.asyncFactory?.error)))
   )
 }
-
-function sameInputType(a, b) {
+/* _cfanlei@
+* 如果第一个节点的类型不是输入框，对比新旧虚拟节点的
+*/
+function sameInputType(a:VNode, b:VNode) {
   if (a.tag !== 'input') return true
-  let i
+  let i:VNodeData | undefined;
   const typeA = isDef((i = a.data)) && isDef((i = i.attrs)) && i.type
   const typeB = isDef((i = b.data)) && isDef((i = i.attrs)) && i.type
-  return typeA === typeB || (isTextInputType(typeA) && isTextInputType(typeB))
+  return typeA === typeB || (isTextInputType(typeA as string) && isTextInputType(typeB as string))
 }
 
 function createKeyToOldIdx(children, beginIdx, endIdx) {
@@ -798,6 +801,11 @@ export function createPatchFunction(backend) {
     }
   }
 
+  /** 首次渲染
+      1、_update(vm._render(),false)
+      2、Vue.prototype._update = function (vnode: VNode, hydrating?: boolean)
+      3、vm.__patch__(vm.$el, vnode, hydrating, false )
+   */
   return function patch(oldVnode, vnode, hydrating, removeOnly) {
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
